@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<head>
+<meta content="utf-8">
+<link rel="stylesheet" href="file:///C:/Users/ILLEGEAR/AppData/Roaming/Dynamo/Dynamo Revit/2.13/packages/Archi-lab_Mandrill/extra/gridster/demo.css">
+<link rel="stylesheet" href="file:///C:/Users/ILLEGEAR/AppData/Roaming/Dynamo/Dynamo Revit/2.13/packages/Archi-lab_Mandrill/extra/gridster/jquery.gridster.min.css">
+<script type="text/javascript" src="file:///C:/Users/ILLEGEAR/AppData/Roaming/Dynamo/Dynamo Revit/2.13/packages/Archi-lab_Mandrill/extra/d3/d3.v3.min.js"></script>
+<script type="text/javascript" src="file:///C:/Users/ILLEGEAR/AppData/Roaming/Dynamo/Dynamo Revit/2.13/packages/Archi-lab_Mandrill/extra/gridster/jquery.min.js"></script>
+<script type="text/javascript" src="file:///C:/Users/ILLEGEAR/AppData/Roaming/Dynamo/Dynamo Revit/2.13/packages/Archi-lab_Mandrill/extra/gridster/jquery.gridster.min.js" type="text/javascript" charset="utf-8"></script>
+<style>
+body {
+    font: 10px Arial;
+}
+
+.axis,
+.frame {
+  shape-rendering: crispEdges;
+}
+
+.axis path {
+    fill: none;
+    stroke: grey;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-family: Arial;
+    font-size: 10px;
+}
+
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+svg {
+    display: block;
+    margin: auto;
+    font: 10px sans-serif;
+    padding: 10px;
+}
+
+circle.hidden {
+  fill: #ccc !important;
+}
+
+.extent {
+  fill: #000;
+  fill-opacity: .125;
+  stroke: #fff;
+}
+</style>
+</head>
+<body>
+<script type="text/javascript">
+        $(window).on('load', function () {
+            var gridster = $(".gridster ul").gridster({
+                widget_base_dimensions: [100, 100],
+                autogenerate_stylesheet: true,
+                widget_margins: [5, 5],
+                autogrow_cols: true,
+                helper: 'clone',
+                shift_widgets_up: false,
+                shift_larger_widgets_down: false,
+                collision: {
+                    wait_for_mouseup: true
+                },
+                resize: {
+                    enabled: false,
+                    stop: function (e, ui, $widget) {
+                        var newDimensions = this.serialize($widget)[0];
+                    }
+                }
+            }).data('gridster');
+            $('.gridster  ul').css({ 'padding': '0' });
+        });
+</script>
+<div class="gridster">
+<ul style="height: 1000px; width: 1000px; position: absolute;">
+<li data-row="1" data-col="1" data-sizex="10" data-sizey="5" class="gs-w"><div class="gridster-box" id="div0" align="center"></div></li>
+<li data-row="1" data-col="1" data-sizex="2" data-sizey="1" class="gs-w"><div class="gridster-box" id="div1" align="center"></div></li>
+</ul>
+</div>
+
+<script type="text/javascript">
+    function renderBarChart() {
+    
+        var data =  [{"name":"Master Bedroom","value":26.971199999999516,"color":0},{"name":"Master Bath","value":7.1255999999993822,"color":0},{"name":"Bedroom","value":27.566683200555143,"color":0},{"name":"Bath","value":10.712507946595945,"color":0},{"name":"Entry Hall","value":30.232865126999091,"color":0},{"name":"Kitchen \u0026 Dining","value":72.564760036618324,"color":0},{"name":"Laundry","value":5.1675449100001272,"color":0},{"name":"Hall","value":23.314057000028011,"color":0},{"name":"Living","value":70.320000000000789,"color":0},{"name":"Mech.","value":2.0608257528462164,"color":0},{"name":"Linen","value":1.3964411999998463,"color":0}];
+    
+        var tickValues = data.map(function (d){return d.name;});
+        var step = Math.floor(tickValues.length / 11);
+        var indexes = d3.range(0,tickValues.length, step);
+        if (indexes.indexOf(tickValues.length - 1) == -1){
+            indexes.push(tickValues.length - 1);
+        }
+        var tickArray = d3.permute(tickValues, indexes);
+    
+        var margin = { top: 20, right: 20, bottom: 40, left: 40 },
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+    
+        var x = d3.scale.ordinal()
+            .domain(data.map(function (d) { return d.name; }))
+            .rangeBands([0, width], 0.1, 0.35);
+    
+        var y = d3.scale.linear()
+            .range([height, 0]);
+    
+        var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom")
+            .tickValues(tickArray);
+    
+        var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+    
+        var barChart = d3.select("#div0").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+            y.domain([0, 72.5647600366183]);
+    
+
+            barChart.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis)
+                .selectAll("text")
+                  .style("text-anchor", "end")
+                  .attr("dx", "-0.8em")
+                  .attr("dy", "0.15em")
+                  .attr("transform", function(d){
+                      return "rotate(-65)"
+                  });
+         
+    
+        barChart.append("g")
+            .attr("class", "y axis")
+            .call(yAxis)
+            .append("text")
+            .attr("transform", "rotate(-90)")
+            .attr("y", 6)
+            .attr("dy", ".71em")
+            .style("text-anchor", "end")
+            .text("Label");
+    
+        barChart.selectAll("#bar")
+            .data(data)
+            .enter().append("rect")
+            .attr("id", "bar")
+            .attr("x", function (d) { return x(d.name); })
+            .attr("width", x.rangeBand())
+            .attr("y", function (d) { return y(d.value); })
+            .attr("fill", "#3282BE")
+            .attr("height", function (d) { return height - y(d.value); })
+            .on("click", function() {sortBars();})
+            .on("mouseover", function(d){
+    
+                var xPos = parseFloat(d3.select(this).attr("x"));
+                var yPos = parseFloat(d3.select(this).attr("y"));
+                var height = parseFloat(d3.select(this).attr("height"));
+                var width = parseFloat(d3.select(this).attr("width"));
+    
+                d3.select(this).attr("fill", "#FF0000");
+    
+                barChart.append("text")
+                    .attr("x",xPos)
+                    .attr("y", yPos - 3)
+                    .attr("font-family", "sans-serif")
+                    .attr("font-size", "10px")
+                    .attr("font-weight", "bold")
+                    .attr("fill", "black")
+                    .attr("text-anchor", "middle")
+                    .attr("id", "tooltip")
+                    .attr("transform", "translate(" + width/2 + ")")
+                    .text(d.name +": "+ d.value);
+            })
+            .on("mouseout", function(){
+                barChart.selectAll("#tooltip").remove();
+                d3.select(this).attr("fill", "#3282BE");             
+            });
+        
+
+        var sortOrder = false;
+        var sortBars = function() {
+    
+            //Flip value of sortOrder
+            sortOrder = !sortOrder;
+    
+            var x0 = x.domain(data.sort(sortOrder
+              ? function(a, b) { return b.value - a.value; }
+              : function(a, b) { return d3.ascending(a.name, b.name); })
+              .map(function(d) { return d.name; }))
+              .copy();
+    
+            barChart.selectAll("#bar")
+              .sort(function(a, b) { return x0(a.name) - x0(b.name); });
+    
+            var transition = barChart.transition().duration(750);
+            var delay = function(d, i) { return i * 50; };
+    
+            transition.selectAll("#bar")
+                .delay(delay)
+                .attr("x", function(d) { return x0(d.name); });
+    
+            transition.select(".x.axis")
+                .call(xAxis)
+
+
+
+            barChart.select('.x.axis')
+                .selectAll("text")
+                    .style("text-anchor", "end")
+                    .attr("dx", "-0.8em")
+                    .attr("dy", "0.15em")
+                    .attr("transform", function(d){ return "rotate(-65)";});
+            
+
+            };
+    
+        function type(d) {
+            d.value = +d.value;
+            return d;
+        }
+    }
+    renderBarChart();
+</script>
+
+<script type="text/javascript">
+    function LoadText()
+    {
+        var paragraph = document.createElement("p");
+        paragraph.style.fontSize = "20px";
+        paragraph.style.color = "#000000";
+        paragraph.style.textTransform = "none";
+        paragraph.style.fontWeight = "normal";
+        paragraph.style.fontStyle = "normal";
+
+        // center text note in div
+        paragraph.style.margin = "0";
+        paragraph.style.top = "50%";
+        paragraph.style.position = "absolute";
+        paragraph.style.left = "50%";
+        paragraph.style.marginRight = "-50%";
+        paragraph.style.transform = "translate(-50%, -50%)";
+        
+        var node = document.createTextNode("Dynamo Dashboard Tutorial");
+        paragraph.appendChild(node);
+
+        document.getElementById("div1").appendChild(paragraph);
+    }
+    LoadText();
+</script>
+
+</body>
+
